@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { Suspense, useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { RestaurantCard } from '@/components/restaurant-card'
 import { SearchFilters } from '@/components/search-filters'
 import { restaurants } from '@/lib/data/restaurants'
-import { FilterState, SortOption, CuisineType, Restaurant } from '@/lib/types'
+import { FilterState, SortOption, CuisineType } from '@/lib/types'
 
-export default function RestaurantsPage() {
+function RestaurantsContent() {
   const searchParams = useSearchParams()
 
   const [filters, setFilters] = useState<FilterState>({
@@ -90,7 +90,9 @@ export default function RestaurantsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-serif font-bold mb-2">Restaurants</h1>
+        <h1 className="text-3xl md:text-4xl font-serif font-bold mb-2">
+          Restaurants
+        </h1>
         <p className="text-muted-foreground">
           Discover and book tables at {restaurants.length} amazing restaurants
         </p>
@@ -107,17 +109,24 @@ export default function RestaurantsPage() {
         {filteredRestaurants.length > 0 ? (
           <>
             <p className="text-sm text-muted-foreground mb-4">
-              Showing {filteredRestaurants.length} restaurant{filteredRestaurants.length !== 1 ? 's' : ''}
+              Showing {filteredRestaurants.length} restaurant
+              {filteredRestaurants.length !== 1 ? 's' : ''}
             </p>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredRestaurants.map((restaurant) => (
-                <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+                <RestaurantCard
+                  key={restaurant.id}
+                  restaurant={restaurant}
+                />
               ))}
             </div>
           </>
         ) : (
           <div className="text-center py-16">
-            <p className="text-lg text-muted-foreground mb-2">No restaurants found</p>
+            <p className="text-lg text-muted-foreground mb-2">
+              No restaurants found
+            </p>
             <p className="text-sm text-muted-foreground">
               Try adjusting your filters or search terms
             </p>
@@ -125,5 +134,13 @@ export default function RestaurantsPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function RestaurantsPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center">Loading restaurants...</div>}>
+      <RestaurantsContent />
+    </Suspense>
   )
 }
